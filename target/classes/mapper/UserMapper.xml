@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.software.PScheduling.mapper.IUserMapper">
+    <resultMap id="orderMap" type="com.software.PScheduling.dto.OrderDTO">
+        <result column="product_name" property="productName"/>
+        <result column="product_id" property="productNo"/>
+        <result column="input_date" property="inDate"/>
+        <result column="output_date" property="outDate"/>
+        <result column="product_num" property="productNum"/>
+    </resultMap>
+    <resultMap id="machineMap" type="com.software.PScheduling.dto.MachineDTO">
+        <result column="machine_id" property="machineId"/>
+        <result column="product_id" property="productId"/>
+        <result column="capacity" property="capacity"/>
+    </resultMap>
+    <select id="selectOrder" resultMap="orderMap" parameterType="Map">
+        select product_name,product_imformation.product_id,input_date,output_date,product_num
+        from order_imformation, product_imformation
+        where order_imformation.product_id = product_imformation.product_id and output_date > now()
+    </select>
+    <select id="selectCapacity"  parameterType="String" resultMap="machineMap">
+    select machine_id,product_id,capacity
+    from p_m_capacity
+    where product_id = #{productNo}
+</select>
+</mapper>
+
