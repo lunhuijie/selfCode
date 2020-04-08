@@ -4,25 +4,93 @@
 <mapper namespace="com.software.PScheduling.mapper.IUserMapper">
     <resultMap id="orderMap" type="com.software.PScheduling.dto.OrderDTO">
         <result column="product_name" property="productName"/>
-        <result column="product_id" property="productNo"/>
+        <result column="product_id" property="productId"/>
         <result column="input_date" property="inDate"/>
         <result column="output_date" property="outDate"/>
         <result column="product_num" property="productNum"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_desc" property="orderDesc"/>
     </resultMap>
     <resultMap id="machineMap" type="com.software.PScheduling.dto.MachineDTO">
         <result column="machine_id" property="machineId"/>
         <result column="product_id" property="productId"/>
+        <result column="order_id" property="orderId"/>
         <result column="capacity" property="capacity"/>
+        <result column="start_time" property="startTime"/>
     </resultMap>
+    <resultMap id="productMap" type="com.software.PScheduling.dto.ProductDTO">
+        <result column="product_name" property="productName"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_child_id" property="productChildId"/>
+        <result column="product_child_ratio" property="productChildRatio"/>
+        <result column="desc" property="desc"/>
+    </resultMap>
+
+
+
     <select id="selectOrder" resultMap="orderMap" parameterType="Map">
-        select product_name,product_imformation.product_id,input_date,output_date,product_num
+        select product_name,product_imformation.product_id,input_date,output_date,product_num,order_id
         from order_imformation, product_imformation
         where order_imformation.product_id = product_imformation.product_id and output_date > now()
+    </select>
+    <select id="selectOriOrder" resultMap="orderMap" parameterType="Map">
+        select product_name,product_imformation.product_id,input_date,output_date,product_num,order_id
+        from ori_order_imformation, product_imformation
+        where ori_order_imformation.product_id = product_imformation.product_id
     </select>
     <select id="selectCapacity"  parameterType="String" resultMap="machineMap">
     select machine_id,product_id,capacity
     from p_m_capacity
-    where product_id = #{productNo}
-</select>
+    where product_id = #{productId}
+    </select>
+    <select id="selectMachine"  parameterType="String" resultMap="machineMap">
+    select p_m_capacity.machine_id,p_m_capacity.product_id,capacity,start_time
+    from p_m_capacity,machine_imformation
+    where p_m_capacity.product_id = #{productId} and p_m_capacity.machine_id = machine_imformation.machine_id
+    </select>
+    <select id="selectProduct"  resultMap="productMap" parameterType="Map">
+    select product_id,product_name,product_child_id,product_imformation.desc
+    from product_imformation
+    </select>
+    <select id="selectProductById" resultMap="productMap" parameterType="String">
+        select product_id,product_name,product_child_id,product_child_ratio from product_imformation where product_id = #{productId}
+    </select>
+
+
+
+
+
+    <update id ="changeMachine" parameterType ="com.software.PScheduling.dto.MachineDTO">
+        update  machine_imformation
+        <trim prefix="set" suffixOverrides=",">
+            <if test="startTime!=null">start_time=#{startTime},</if>
+            <if test="productId!=null">product_id=#{productId},</if>
+            <if test="orderId!=null">order_id=#{orderId},</if>
+        </trim>
+        where machine_id = #{machineId}
+    </update>
+    <update id ="deleteMachineOrderLog">
+        update  machine_imformation
+       set is_delete  = 1
+        where is_delete = 0
+    </update>
+
+
+
+
+
+    <insert id = "addOrder" parameterType ="com.software.PScheduling.dto.OrderDTO">
+        insert into ori_order_imformation (order_id,product_id,product_num,input_date,output_date,order_desc)
+        values (#{orderId},#{productId},#{productNum},#{inDate},#{outDate},#{orderDesc});
+    </insert>
+    <insert id = "addOkOrder" parameterType ="com.software.PScheduling.dto.OrderDTO">
+        insert into order_imformation (order_id,product_id,product_num,input_date,output_date,order_desc)
+        values (#{orderId},#{productId},#{productNum},#{inDate},#{outDate},#{orderDesc});
+    </insert>
+    <insert id = "addMachineOrderLog" parameterType ="com.software.PScheduling.dto.MachineOrderLogDTO">
+        insert into machine_order_log (machine_id,product_id,order_id,start_time,end_time,is_delete)
+        values (#{machineId},#{productId},#{orderId},#{startTime},#{endTime},#{isDelete});
+    </insert>
+
 </mapper>
 

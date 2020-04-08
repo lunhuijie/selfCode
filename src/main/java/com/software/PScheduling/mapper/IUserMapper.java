@@ -1,8 +1,8 @@
 package com.software.PScheduling.mapper;
 import com.software.PScheduling.dto.MachineDTO;
+import com.software.PScheduling.dto.MachineOrderLogDTO;
 import com.software.PScheduling.dto.OrderDTO;
-import com.software.PScheduling.vo.MachineVO;
-import com.software.PScheduling.vo.OrderVO;
+import com.software.PScheduling.dto.ProductDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
@@ -21,4 +21,12 @@ public interface IUserMapper {
 
     List<MachineDTO> selectCapacity(String productNo);
     List<OrderDTO> selectOrder();
+    List<OrderDTO> selectOriOrder();
+    List<MachineDTO> selectMachine(String productNo);
+    List<ProductDTO> selectProduct();
+    ProductDTO selectProductById(String productId);
+    Integer addOrder(OrderDTO orderDTO);
+    Integer addOkOrder(OrderDTO orderDTO);
+    void addMachineOrderLog(MachineOrderLogDTO machineOrderLogDTO);
+    void changeMachine(MachineDTO machineDTO);
 }
