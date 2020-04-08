@@ -160,9 +160,10 @@ System.out.println(orderDTO);
                     float maxProductNum = maxMachine.getCapacity()*((orderDTO.getOutDate().getTime()-maxMachine.getStartTime().getTime())/(60*60*1000));
                     System.out.println("此时这台机器无法完成对于该订单的全部生产；进行第二个机器的生产工作");
                     orderDTO.setProductNum(orderDTO.getProductNum()-(int)maxProductNum);
-                    doMachine(orderDTO);
+
                     //更新机器的状态
                     changeMachine(maxMachine,maxMachine.getStartTime(),orderDTO.getOutDate(),orderDTO.getOrderId(),orderDTO.getProductId());
+                    doMachine(orderDTO);
                 }
             }
             else{//此时的这台机器已经不能满足生产了，所以从所有适配的机器中移除这台机器,对应的是一条订单
